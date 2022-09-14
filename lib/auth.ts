@@ -2,6 +2,10 @@ import jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "./prisma";
 
+interface JwtPayload {
+  id: string;
+}
+
 export const validateRoute = (handler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const { TRAX_ACCESS_TOKEN: token } = req.cookies;
@@ -10,9 +14,9 @@ export const validateRoute = (handler) => {
       let user;
 
       try {
-        const { id } = jwt.verify(token, "Hello-Sarah");
+        const { id } = jwt.verify(token, "Hello-Sarah") as JwtPayload;
         user = await prisma.user.findUnique({
-          where: { id },
+          where: { id: Number(id) },
         });
 
         if (!user) {
